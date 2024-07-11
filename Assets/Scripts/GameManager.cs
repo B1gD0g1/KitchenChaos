@@ -35,9 +35,9 @@ public class GameManager : MonoBehaviour
 	}
 
 	private State state;
-    private float countdownToStartTimer = 3f;
+    private float countdownToStartTimer = 1f;
     private float gamePlayingTimer;
-    private float gamePlayingTimerMax = 50f;
+    private float gamePlayingTimerMax = 300f;
 	private bool isGamePaused = false;
 
 
@@ -53,6 +53,11 @@ public class GameManager : MonoBehaviour
     {
         GameInput.Instance.OnPauseAciton += GameInput_OnPauseAciton;
         GameInput.Instance.OnInteractAction += GameManager_OnInteractAction;
+
+        //触发游戏自动启动
+        state = State.CountdownToStart;
+        OnStartChanged?.Invoke(this, EventArgs.Empty);
+
     }
 
     private void GameManager_OnInteractAction(object sender, EventArgs e)
