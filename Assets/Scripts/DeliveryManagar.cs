@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
-public class DeliveryManagar : MonoBehaviour
+public class DeliveryManagar : NetworkBehaviour
 {
     public event EventHandler OnRecipeSpawned;
     public event EventHandler OnRecipeComplated;
@@ -19,7 +20,7 @@ public class DeliveryManagar : MonoBehaviour
 
 
     private List<RecipeSO> waitingRecipeSOList;
-    private float spawnRecipeTimer;
+    private float spawnRecipeTimer = 4f;
     private float spawnRecipeTimerMax = 4f;
     private int waitingRecipesMax = 4;
     private int successfulRecipesAmount;
@@ -35,6 +36,11 @@ public class DeliveryManagar : MonoBehaviour
 
     private void Update()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         spawnRecipeTimer -= Time.deltaTime;
         if (spawnRecipeTimer <= 0f)
         {
@@ -42,14 +48,22 @@ public class DeliveryManagar : MonoBehaviour
 
             if (GameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitingRecipesMax)
             {
-                RecipeSO waitngRecipeSO = recipeListSO.recipeSOList[UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count)];
-                
-                waitingRecipeSOList.Add(waitngRecipeSO);
+                int waitingRecipeSOIndex = UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count);
 
-
-                OnRecipeSpawned?.Invoke(this,EventArgs.Empty);
+                spawnNewWaitingRecipeClientRPC(waitingRecipeSOIndex);
             }
         }
+    }
+
+    [ClientRpc]
+    private void spawnNewWaitingRecipeClientRPC(int waitingRecipeSOIndex)
+    {
+        RecipeSO waitingRecipeSO = recipeListSO.recipeSOList[waitingRecipeSOIndex];
+
+        waitingRecipeSOList.Add(waitingRecipeSO);
+
+
+        OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
     }
 
     public void DeliverRecipe(PlateKitchenObject plateKitchenObject)
@@ -89,12 +103,7 @@ public class DeliveryManagar : MonoBehaviour
                     //玩家交付了正确的餐
 
                     //记录交付餐的数量
-                    successfulRecipesAmount++;
-
-                    waitingRecipeSOList.RemoveAt(i);
-
-                    OnRecipeComplated?.Invoke(this,EventArgs.Empty);
-                    OnRecipeSuccess?.Invoke(this,EventArgs.Empty);
+                    DeliverCorrectRecipeServerRpc(i);
                     return;
                 }
             }
@@ -102,8 +111,38 @@ public class DeliveryManagar : MonoBehaviour
 
         //都不匹配
         //玩家做出错误配料的餐
-        OnRecipeFaild?.Invoke(this,EventArgs.Empty);
-        
+        DeliverIncorrectRecipeServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliverIncorrectRecipeServerRpc()
+    {
+        DeliverIncorrectRecipeClientRpc();
+    }
+
+    [ClientRpc]
+    private void DeliverIncorrectRecipeClientRpc()
+    {
+        //玩家做出错误配料的餐
+        OnRecipeFaild?.Invoke(this, EventArgs.Empty);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliverCorrectRecipeServerRpc(int waitingRecipeSOListIndex)
+    {
+        DeliverCorrectRecipeClientRpc(waitingRecipeSOListIndex);
+    }
+
+    [ClientRpc]
+    private void DeliverCorrectRecipeClientRpc(int waitingRecipeSOListIndex)
+    {
+        //记录交付餐的数量
+        successfulRecipesAmount++;
+
+        waitingRecipeSOList.RemoveAt(waitingRecipeSOListIndex);
+
+        OnRecipeComplated?.Invoke(this, EventArgs.Empty);
+        OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
     }
 
     public List<RecipeSO> GetWaitingRecipeSOList()
