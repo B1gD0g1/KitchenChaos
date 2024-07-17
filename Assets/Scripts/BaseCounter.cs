@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BaseCounter : MonoBehaviour , IKitchenObjectParent
+public class BaseCounter : NetworkBehaviour , IKitchenObjectParent
 {
     public static event EventHandler OnAnyObjectPlacedHere;
 
@@ -60,6 +61,8 @@ public class BaseCounter : MonoBehaviour , IKitchenObjectParent
         return kitchenObject != null;
     }
 
-
-
+    public NetworkObject GetNetworkObject()
+    {
+        return NetworkObject;
+    }
 }

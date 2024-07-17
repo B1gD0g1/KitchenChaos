@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class ContainerCounter : BaseCounter
@@ -20,8 +21,19 @@ public class ContainerCounter : BaseCounter
 
             //Debug.Log( kitchenObjectTransform.GetComponent<KitchenObject>().GetKitchenObjectSO().objectName );
 
-            OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
+            InteractLogicServerRpc();
         }
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void InteractLogicServerRpc()
+    {
+        InteractLogicClientRpc();
+    }
+
+    [ClientRpc]
+    private void InteractLogicClientRpc()
+    {
+        OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
+    }
 }
