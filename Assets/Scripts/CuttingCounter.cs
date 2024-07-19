@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class CuttingCounter : BaseCounter,IHasProgress
@@ -31,16 +32,10 @@ public class CuttingCounter : BaseCounter,IHasProgress
                 //玩家手里拿着物品
                 if (HasRecipeWithInput(player.GetKitchenObject().GetKitchenObjectSO()))
                 {   //玩家携带了一些可以被切割的东西
-                    player.GetKitchenObject().SetKitchenObjectParent(this);
-                    cuttingProgress = 0;
+                    KitchenObject kitchenObject = player.GetKitchenObject();
+                    kitchenObject.SetKitchenObjectParent(this);
 
-                    CuttingRecipSO cuttingRecipSO = GetCuttingRecipSOWithInout(GetKitchenObject().GetKitchenObjectSO());
-
-                    OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
-                    {
-                        progressNormalized = (float)cuttingProgress / cuttingRecipSO.cuttingProgressMax
-                    });
-
+                    InteractLogicPlaceObjectOnCounterServerRpc();
                 }
             }
             else
@@ -72,34 +67,77 @@ public class CuttingCounter : BaseCounter,IHasProgress
         }
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void InteractLogicPlaceObjectOnCounterServerRpc()
+    {
+        InteractLogicPlaceObjectOnCounterClientRpc();
+    }
+
+    [ClientRpc]
+    private void InteractLogicPlaceObjectOnCounterClientRpc()
+    {
+        cuttingProgress = 0;
+
+        //CuttingRecipSO cuttingRecipSO = GetCuttingRecipSOWithInout(kitchenObject.GetKitchenObjectSO());
+
+        OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
+        {
+            //progressNormalized = (float)cuttingProgress / cuttingRecipSO.cuttingProgressMax
+            progressNormalized = 0f
+
+        });
+    }
+
     public override void InteractAlternate(Player player)
     {
         if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
         {
             //桌上有物品并且可以切割
-            cuttingProgress++;
+            CutObjectServerRpc();
+            TestCuttingProgressDonServerRpc();
+        }
+    }
 
-            OnCut?.Invoke(this, EventArgs.Empty);
-            
-            OnAnyCut?.Invoke(this, EventArgs.Empty);
+    [ServerRpc(RequireOwnership = false)]
+    private void CutObjectServerRpc()
+    {
+        CutObjectClientRpc();
+    }
 
-            CuttingRecipSO cuttingRecipSO = GetCuttingRecipSOWithInout(GetKitchenObject().GetKitchenObjectSO());
+    [ClientRpc]
+    private void CutObjectClientRpc()
+    {
+        //桌上有物品并且可以切割
+        cuttingProgress++;
 
-            OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
-            {
-                progressNormalized = (float)cuttingProgress / cuttingRecipSO.cuttingProgressMax
-            });
+        OnCut?.Invoke(this, EventArgs.Empty);
 
-            if (cuttingProgress >= cuttingRecipSO.cuttingProgressMax)
-            {
-                KitchenObjectSO outputKitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
-                //销毁原有的对象
-                GetKitchenObject().DestroySelf();
+        OnAnyCut?.Invoke(this, EventArgs.Empty);
 
-                //生成新的对象
-                KitchenObject.SpawnKitchenObject(outputKitchenObjectSO, this);
-            }
+        CuttingRecipSO cuttingRecipSO = GetCuttingRecipSOWithInout(GetKitchenObject().GetKitchenObjectSO());
 
+        OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
+        {
+            progressNormalized = (float)cuttingProgress / cuttingRecipSO.cuttingProgressMax
+        });
+
+        
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void TestCuttingProgressDonServerRpc()
+    {
+        CuttingRecipSO cuttingRecipSO = GetCuttingRecipSOWithInout(GetKitchenObject().GetKitchenObjectSO());
+
+        if (cuttingProgress >= cuttingRecipSO.cuttingProgressMax)
+        {
+            KitchenObjectSO outputKitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
+
+            //销毁原有的对象
+            KitchenObject.DestroyKitchenObject(GetKitchenObject());
+
+            //生成新的对象
+            KitchenObject.SpawnKitchenObject(outputKitchenObjectSO, this);
         }
     }
 
