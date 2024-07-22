@@ -9,19 +9,23 @@ public class TestingNetcodeUI : MonoBehaviour
     [SerializeField] private Button startHostButton;
     [SerializeField] private Button startClientButton;
 
+
+
+
+
     private void Awake()
     {
         startHostButton.onClick.AddListener(() =>
         {
             Debug.Log("Host");
-            NetworkManager.Singleton.StartHost();
+            KitchenGameMultiplayer.Instance.StartHost();
             Hide();
         });
 
         startClientButton.onClick.AddListener(() =>
         {
             Debug.Log("Client");
-            NetworkManager.Singleton.StartClient();
+            KitchenGameMultiplayer.Instance.StartClient();
             Hide();
         }); 
     }
