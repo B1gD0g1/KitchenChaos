@@ -33,6 +33,7 @@ public class Player : NetworkBehaviour ,IKitchenObjectParent
     [SerializeField] private LayerMask collisionsLayerMask;
     [SerializeField] private Transform kitchenObjectHoldPoint;
     [SerializeField] private List<Vector3> spawnPositionList;
+    [SerializeField] private PlayerVisual playerVisual;
 
 
     private bool isWalking;
@@ -46,6 +47,12 @@ public class Player : NetworkBehaviour ,IKitchenObjectParent
     {
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
         GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+
+        //获取颜色数据
+        PlayerData playerData = KitchenGameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        //设置颜色
+        playerVisual.SetPlayerColor(KitchenGameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
+
     }
 
     public override void OnNetworkSpawn()
@@ -55,7 +62,7 @@ public class Player : NetworkBehaviour ,IKitchenObjectParent
             LocalInstance = this;
         }
 
-        transform.position = spawnPositionList[(int)OwnerClientId];
+        transform.position = spawnPositionList[KitchenGameMultiplayer.Instance.GetPlayerDateIndexFromClientId(OwnerClientId)];
 
         OnAnyPlayerSpawn?.Invoke(this,EventArgs.Empty);
 
