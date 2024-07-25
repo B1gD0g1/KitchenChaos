@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,6 +11,7 @@ public class KitchenGameMultiplayer : NetworkBehaviour
 {
 
     public const int MAX_PLAYER_AMOUNT = 4;
+    private const string PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER = "PlayerNameMultiplayer"; 
 
     
     public static KitchenGameMultiplayer Instance { get; private set; }
@@ -20,11 +23,11 @@ public class KitchenGameMultiplayer : NetworkBehaviour
 
 
     [SerializeField] private KitchenObjectListSO kitchenObjectListSO;
-    [SerializeField] private List<Color> playerColorList;
+    [SerializeField] private List<UnityEngine.Color> playerColorList;
 
 
     private NetworkList<PlayerData> playerDataNetworkList;
-
+    private string playerName;
 
 
 
@@ -35,8 +38,22 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
 
 
+        playerName = PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, "PlayerName" + UnityEngine.Random.Range(100,1000));
+        
         playerDataNetworkList = new NetworkList<PlayerData>();
         playerDataNetworkList.OnListChanged += PlayerDateNetworkList_OnListChanged;
+    }
+
+    public string GetPlayerName()
+    {
+        return playerName;
+    }
+
+    public void SetPlayerName(string playerName)
+    {
+        this.playerName = playerName;
+
+        PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
     }
 
     private void PlayerDateNetworkList_OnListChanged(NetworkListEvent<PlayerData> changeEvent)
@@ -74,6 +91,9 @@ public class KitchenGameMultiplayer : NetworkBehaviour
             clientId = clientId,
             colorId = GetFirstUnusedColorId(),
         });
+
+        SetPlayerNameServerRpc(GetPlayerName());
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
     }
 
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest, NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
@@ -100,8 +120,49 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
 
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
+        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectCallback;
         NetworkManager.Singleton.StartClient();
     }
+
+    private void NetworkManager_Client_OnClientConnectCallback(ulong clientId)
+    {
+        SetPlayerNameServerRpc(GetPlayerName());
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerNameServerRpc(string playerName, ServerRpcParams serverRpcParams = default)
+    {
+
+        int playerDataIndex = GetPlayerDateIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        //获取对象
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        //修改名字
+        playerData.playerName = playerName;
+
+        //更新
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetPlayerIdServerRpc(string playerId, ServerRpcParams serverRpcParams = default)
+    {
+
+        int playerDataIndex = GetPlayerDateIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        //获取对象
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        //修改玩家Id
+        playerData.playerId = playerId;
+
+        //更新
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+
 
     private void NetworkManager_Client_OnClientDisconnectCallback(ulong clientId)
     {
@@ -211,7 +272,7 @@ public class KitchenGameMultiplayer : NetworkBehaviour
         return playerDataNetworkList[playerIndex];
     }
     
-    public Color GetPlayerColor(int colorId)
+    public UnityEngine.Color GetPlayerColor(int colorId)
     {
         return playerColorList[colorId];
     }

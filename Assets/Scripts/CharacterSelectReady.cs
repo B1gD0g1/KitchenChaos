@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class CharacterSelectReady : NetworkBehaviour
 {
@@ -51,6 +50,7 @@ public class CharacterSelectReady : NetworkBehaviour
 
         if (allClientsReady)
         {
+            KitchenGameLobby.Instance.DeleteDestroy();
             Loader.LoadNetwork(Loader.Scene.GameScenes);
         }
     }

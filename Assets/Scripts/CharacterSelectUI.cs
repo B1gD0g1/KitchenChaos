@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +20,8 @@ public class CharacterSelectUI : MonoBehaviour
     {
         mainMenuButton.onClick.AddListener(() =>
         {
+            KitchenGameLobby.Instance.LeaveLobby();
+            NetworkManager.Singleton.Shutdown();
             Loader.Load(Loader.Scene.MainMenuScene);
         });
 

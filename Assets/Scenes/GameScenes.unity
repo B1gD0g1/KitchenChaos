@@ -959,7 +959,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u518D\u73A9\u4E00\u6B21"
+  m_text: "\u8FD4\u56DE"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 703ca580ebf3bf34687e06ca6d62bbd5, type: 2}
   m_sharedMaterial: {fileID: 8721550642418012870, guid: 703ca580ebf3bf34687e06ca6d62bbd5,
@@ -1003,7 +1003,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

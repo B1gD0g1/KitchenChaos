@@ -387,6 +387,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 8263554102444184124, guid: 3705d06a961ac96479157e459d5f87b9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 3705d06a961ac96479157e459d5f87b9, type: 3}
 --- !u!1 &454291104
 GameObject:
@@ -3155,6 +3159,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 8263554102444184124, guid: 3705d06a961ac96479157e459d5f87b9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 3705d06a961ac96479157e459d5f87b9, type: 3}
 --- !u!1 &1506548495
 GameObject:
@@ -3380,7 +3388,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u518D\u73A9\u4E00\u6B21"
+  m_text: "\u8FD4\u56DE"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 703ca580ebf3bf34687e06ca6d62bbd5, type: 2}
   m_sharedMaterial: {fileID: 8721550642418012870, guid: 703ca580ebf3bf34687e06ca6d62bbd5,
@@ -4212,6 +4220,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 8263554102444184124, guid: 3705d06a961ac96479157e459d5f87b9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 3705d06a961ac96479157e459d5f87b9, type: 3}
 --- !u!1001 &3698068759170900810
 PrefabInstance:
@@ -4415,6 +4427,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2760568773749095188, guid: 3705d06a961ac96479157e459d5f87b9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 8263554102444184124, guid: 3705d06a961ac96479157e459d5f87b9,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
