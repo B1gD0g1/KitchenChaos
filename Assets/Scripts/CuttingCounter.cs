@@ -101,7 +101,11 @@ public class CuttingCounter : BaseCounter,IHasProgress
     [ServerRpc(RequireOwnership = false)]
     private void CutObjectServerRpc()
     {
-        CutObjectClientRpc();
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
+        {
+            //桌上有物品并且可以切割
+            CutObjectClientRpc();
+        }
     }
 
     [ClientRpc]
@@ -127,17 +131,21 @@ public class CuttingCounter : BaseCounter,IHasProgress
     [ServerRpc(RequireOwnership = false)]
     private void TestCuttingProgressDonServerRpc()
     {
-        CuttingRecipSO cuttingRecipSO = GetCuttingRecipSOWithInout(GetKitchenObject().GetKitchenObjectSO());
-
-        if (cuttingProgress >= cuttingRecipSO.cuttingProgressMax)
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
         {
-            KitchenObjectSO outputKitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
+            //桌上有物品并且可以切割
+            CuttingRecipSO cuttingRecipSO = GetCuttingRecipSOWithInout(GetKitchenObject().GetKitchenObjectSO());
 
-            //销毁原有的对象
-            KitchenObject.DestroyKitchenObject(GetKitchenObject());
+            if (cuttingProgress >= cuttingRecipSO.cuttingProgressMax)
+            {
+                KitchenObjectSO outputKitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
 
-            //生成新的对象
-            KitchenObject.SpawnKitchenObject(outputKitchenObjectSO, this);
+                //销毁原有的对象
+                KitchenObject.DestroyKitchenObject(GetKitchenObject());
+
+                //生成新的对象
+                KitchenObject.SpawnKitchenObject(outputKitchenObjectSO, this);
+            }
         }
     }
 

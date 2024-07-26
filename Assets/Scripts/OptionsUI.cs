@@ -137,8 +137,8 @@ public class OptionsUI : MonoBehaviour
 
     private void UpdateVisual()
     {
-        soundEffectsText.text = "Sound Effects: " + Mathf.Round(SoundManager.Instance.GetVolume() * 10f);
-        musicText.text = "Music: " + Mathf.Round(MusicManager.Instance.GetVolume() * 10f);
+        soundEffectsText.text = "“Ù–ß“Ù¡ø: " + Mathf.Round(SoundManager.Instance.GetVolume() * 10f);
+        musicText.text = "“Ù¿÷“Ù¡ø: " + Mathf.Round(MusicManager.Instance.GetVolume() * 10f);
 
         moveUpText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Move_Up);
         moveDownText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Move_Down);

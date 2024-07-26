@@ -40,6 +40,8 @@ public class LobbyCreatUI : MonoBehaviour
     public void Show()
     {
         gameObject.SetActive(true);
+
+        creatPublicButton.Select();
     }
 
     private void Hide()
