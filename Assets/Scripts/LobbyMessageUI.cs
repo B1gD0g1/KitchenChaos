@@ -87,5 +87,10 @@ public class LobbyMessageUI : MonoBehaviour
     private void OnDestroy()
     {
         KitchenGameMultiplayer.Instance.OnFailedToJoinGame -= KitchenGameMultiplayer_OnFailedToJoinGame;
+        KitchenGameLobby.Instance.OnCreatLobbyStarted -= KitchenGameLobby_OnCreatLobbyStarted;
+        KitchenGameLobby.Instance.OnCreatLobbyFailed -= KitchenGameLobby_OnCreatLobbyFailed;
+        KitchenGameLobby.Instance.OnJoinStarted -= KitchenGameLobby_OnJoinStarted;
+        KitchenGameLobby.Instance.OnQuickJoinFailed -= KitchenGameLobby_OnQuickJoinFailed;
+        KitchenGameLobby.Instance.OnJoinFailed -= KitchenGameLobby_OnJoinFailed;
     }
 }
