@@ -55,6 +55,7 @@ public class KitchenGameLobby : MonoBehaviour
         if (UnityServices.State != ServicesInitializationState.Initialized)
         {
             InitializationOptions initializationOptions = new InitializationOptions();
+            //该行代码保证多开EXE程序时，不会是同一个账户
             initializationOptions.SetProfile(UnityEngine.Random.Range(0,10000).ToString());
 
             await UnityServices.InitializeAsync(initializationOptions);
